@@ -1,65 +1,81 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Nov 23 13:46:54 2024
-
-@author: kangkyeongmo
-"""
-
-import sqlite3
 import pandas as pd
-import re
-from scipy import stats
-import matplotlib.pyplot as plt
-import seaborn as sns
-import os 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_squared_error
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import numpy as np
 
+# === Load Datasets ===
+# File paths
+num_file = "/Users/kangkyeongmo/Desktop/School/2024_Fall/DS-GA_1001_001/Group_Project/Capstone/rmpCapstoneNum.csv"
+tags_file = "/Users/kangkyeongmo/Desktop/School/2024_Fall/DS-GA_1001_001/Group_Project/Capstone/rmpCapstoneTags.csv"
+qual_file = "/Users/kangkyeongmo/Desktop/School/2024_Fall/DS-GA_1001_001/Group_Project/Capstone/rmpCapstoneQual.csv"
 
-# General info, Define  column names
-column_names = ["Average Rating", 
-                "Average Difficulty", 
-                "Number of ratings",
-                "Received a 'pepper'?",
-                "The proportion of students that said they would take the class again",
-                "The number of ratings coming from online classes",
-                "Male",
-                "Female"]
-df_num = pd.read_csv("rmpCapstoneNum.csv", header=None, names=column_names)
-print(df_num.columns)
+# Define column names
+num_columns = [
+    "Average Rating", "Average Difficulty", "Number of Ratings",
+    "Received a 'pepper'?", "Proportion Would Retake",
+    "Online Ratings Count", "Male", "Female"
+]
+tags_columns = [
+    "Tough Grader", "Good Feedback", "Respected", "Lots to Read",
+    "Participation Matters", "Don’t Skip Class", "Lots of Homework",
+    "Inspirational", "Pop Quizzes", "Accessible", "So Many Papers",
+    "Clear Grading", "Hilarious", "Test Heavy", "Graded by Few Things",
+    "Amazing Lectures", "Caring", "Extra Credit", "Group Projects",
+    "Lecture Heavy"
+]
+qual_columns = ["Major/Field", "University", "State"]
 
-# Major|University|States, define column names
-column_names2 = ["Major/Field", "University", "US State (2 letter abbreviation)" ]
-df_qual = pd.read_csv("rmpCapstoneQual.csv", header=None, names=column_names2)
-print(df_qual.columns)
+# Load datasets
+df_num = pd.read_csv(num_file, header=None, names=num_columns)
+df_tags = pd.read_csv(tags_file, header=None, names=tags_columns)
+df_qual = pd.read_csv(qual_file, header=None, names=qual_columns)
 
-# 3 Tags, define column names
-column_names3 = ["Tough grader", 
-                 "Good feedback", 
-                 "Respected", 
-                 "Lots to read", 
-                 "Participation matters", 
-                 "Don’t skip class or you will not pass", 
-                 "Lots of homework", 
-                 "Inspirational", 
-                 "Pop quizzes!", 
-                 "Accessible", 
-                 "So many papers", 
-                 "Clear grading", 
-                 "Hilarious",
-                 "Test heavy", 
-                 "Graded by few things", 
-                 "Amazing lectures", 
-                 "Caring", 
-                 "Extra credit", 
-                 "Group projects", 
-                 "Lecture heavy"]
-df_tags = pd.read_csv("rmpCapstoneTags.csv", header=None, names=column_names3)
-print(df_tags.columns)
+# Prepare data
+X = df_tags
+y = df_num["Average Rating"]
 
-## Q8. Build a regression model predicting average ratings from all 
-## tags (the ones in the rmpCapstoneTags.csv) file. Make sure to 
-## include the R2 and RMSE of this model. Which of these tags is most
-## strongly predictive of average rating? Hint: Make sure to address 
-## collinearity concerns. Also comment on how this model compares 
-## to the previous one.
+# Handle missing values
+X = X.fillna(0)
+y = y.fillna(y.mean())
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Build regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict and evaluate
+y_pred = model.predict(X_test)
+r2 = r2_score(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+print(f"R^2: {r2:.4f}")
+print(f"RMSE: {rmse:.4f}")
+
+# Identify the most predictive tag
+coefficients = pd.DataFrame({
+    "Tag": tags_columns,
+    "Coefficient": model.coef_
+}).sort_values(by="Coefficient", ascending=False)
+
+print("\nMost Predictive Tags:")
+print(coefficients.head(3))
+
+# Address multicollinearity: Calculate VIF
+X_with_constant = np.hstack([np.ones((X_train.shape[0], 1)), X_train])  # Add constant for VIF calculation
+vif_data = pd.DataFrame({
+    "Feature": ["Intercept"] + tags_columns,
+    "VIF": [variance_inflation_factor(X_with_constant, i) for i in range(X_with_constant.shape[1])]
+})
+
+print("\nVariance Inflation Factors (VIF):")
+print(vif_data)
+
+# Highlight features with high VIF
+high_vif = vif_data[vif_data["VIF"] > 5]
+if not high_vif.empty:
+    print("\nFeatures with High Multicollinearity (VIF > 5):")
+    print(high_vif)
