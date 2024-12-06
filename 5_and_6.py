@@ -175,7 +175,9 @@ mean2 = np.mean(female_diff_array)
 std1 = np.std(male_diff_array)
 std2 = np.std(female_diff_array)
 
+
 numerator = mean1 - mean2
 denominator = np.sqrt((std1**2)/2 + (std2**2)/2) # pooled std
 d = numerator/denominator
 print(d)
+
