@@ -1,13 +1,13 @@
 import pandas as pd
-import random
 import sqlite3
 import os
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
+
 # Set random seed
-rng = np.random.default_rng(1) 
+rng = np.random.default_rng(17010868) 
 
 def main():
 
@@ -66,6 +66,7 @@ def get_difficulty_df():
     conn.close()
     return difficulty
 
+
 males = get_males_df()
 females = get_females_df()
 difficulty = get_difficulty_df()
@@ -90,34 +91,45 @@ plt.show()
 
 test = stats.mannwhitneyu(male_diff, female_diff, alternative="two-sided")
 print(test)
-
-def bootstrap(arr):
+###############################################################################
+def bootstrap(arr1, arr2):
     # Set number of experiments
     num_experiments = int(1e4) # 10000 runs
 
     # Set number of samples per experiment
-    num_samples = len(arr) # Sample 2000 values in each experiment
+    num_samples1 = len(arr1) # Sample 2000 values in each experiment
+    num_samples2 = len(arr2) # Sample 2000 values in each experiment
 
 
     # Store the sample means in a list
-    bootstrapped_means = []
+    bootstrapped_d = []
     # First let's try sampling once
     for i in range(num_experiments):
         # Collect 2000 samples
-        indices = rng.integers(low=0, high=len(arr), size=num_samples)
+        indices1 = rng.integers(low=0, high=num_samples1, size=num_samples1)
+        indices2 = rng.integers(low=0, high=num_samples2, size=num_samples2)
+        
         # print(indices)
-        sampled_ratings = arr[indices]
+        sampled_ratings1 = arr1[indices1]
+        sampled_ratings2 = arr2[indices2]
         # print(sampled_ratings)
         # Find the sample mean
-        sample_mean = np.mean(sampled_ratings)
-        bootstrapped_means.append(sample_mean)
-    return bootstrapped_means
+        mean1 = np.mean(sampled_ratings1)
+        mean2 = np.mean(sampled_ratings2)
+        std1 = np.std(sampled_ratings1)
+        std2 = np.std(sampled_ratings2)
+
+        numerator = abs(mean1 - mean2)
+        denominator = np.sqrt((std1**2)/2 + (std2**2)/2) # pooled std
+        d = numerator/denominator
+        bootstrapped_d.append(d)
+    return bootstrapped_d
 
 male_diff_array = male_diff.to_numpy()
 female_diff_array = female_diff.to_numpy()
 
-male_means = bootstrap(male_diff_array)
-female_means = bootstrap(female_diff_array)
+effect_size = bootstrap(male_diff_array,female_diff_array)
+#female_means = bootstrap(female_diff_array)
 
 # Plot the distribution of sample means
 
@@ -126,31 +138,22 @@ female_means = bootstrap(female_diff_array)
 plt.show()
 
 # Let's calculate the 95% confidence intervals
-lower_confidence_bound_male = np.percentile(male_means, 2.5)
-upper_confidence_bound_male = np.percentile(male_means, 97.5)
-
-lower_confidence_bound_female = np.percentile(female_means, 2.5)
-upper_confidence_bound_female = np.percentile(female_means, 97.5)
+lower_confidence_bound_male = np.percentile(effect_size, 2.5)
+upper_confidence_bound_male = np.percentile(effect_size, 97.5)
 
 # Let's plot these two points on the plot!
 
 # Plot the histogram
 plt.figure(figsize=(8, 5))
-plt.hist(male_means, bins=50, density=True, alpha=0.6, color='b', edgecolor='black')
-plt.hist(female_means, bins=50, density=True, alpha=0.6, color='r', edgecolor='black')
+plt.hist(effect_size, bins=50, density=True, alpha=0.6, color='b', edgecolor='black')
 
 # Calculate population mean estimate from bootstrap
-male_mean_estimate = np.mean(male_means)
-female_mean_estimate = np.mean(female_means)
+effect_size_mean = np.mean(effect_size)
 
 # Add confidence bounds as vertical lines
 plt.axvline(lower_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound (Male)')
 plt.axvline(upper_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound (Male)')
-plt.axvline(male_mean_estimate, color='y', linestyle='solid', linewidth=1.5, label='Mean estimate (Male)')
-
-plt.axvline(lower_confidence_bound_female, color='g', linestyle='dashed', linewidth=1.5, label='2.5% Bound (Female)')
-plt.axvline(upper_confidence_bound_female, color='g', linestyle='dashed', linewidth=1.5, label='97.5% Bound (Female)')
-plt.axvline(female_mean_estimate, color='cyan', linestyle='solid', linewidth=1.5, label='Mean estimate (Female)')
+plt.axvline(effect_size_mean, color='y', linestyle='solid', linewidth=1.5, label='Mean estimate (Male)')
 
 
 # Adding labels and title
@@ -164,7 +167,8 @@ plt.legend()
 # Show the plot
 plt.show()
 
-# Effect Size
+# Effect Size (Cohnen's d is not the best. May be Cliff delta is better. But
+# because we have a lot of data (power), we are good)
 mean1 = np.mean(male_diff_array)
 mean2 = np.mean(female_diff_array)
 std1 = np.std(male_diff_array)
@@ -174,3 +178,4 @@ numerator = abs(mean1 - mean2)
 denominator = np.sqrt((std1**2)/2 + (std2**2)/2) # pooled std
 d = numerator/denominator
 print(d)
+###############################################################################
