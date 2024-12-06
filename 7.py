@@ -147,4 +147,5 @@ plt.xlabel('Feature Index')
 plt.ylabel('Coefficient Value')
 
 plt.tight_layout()
+
 plt.show()
