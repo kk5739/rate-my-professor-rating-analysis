@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-rng = np.random.default_rng(1) 
+rng = np.random.default_rng(17010868) 
 rng = rng.integers(1,1000000)
 df = pd.read_csv('rmpCapstoneNum.csv', header = None)
 

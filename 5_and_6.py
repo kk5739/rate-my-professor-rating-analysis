@@ -1,13 +1,13 @@
 import pandas as pd
-import random
 import sqlite3
 import os
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
+
 # Set random seed
-rng = np.random.default_rng(1) 
+rng = np.random.default_rng(17010868) 
 
 def main():
 
@@ -90,7 +90,7 @@ plt.show()
 
 test = stats.mannwhitneyu(male_diff, female_diff, alternative="two-sided")
 print(test)
-
+###############################################################################
 def bootstrap(arr):
     # Set number of experiments
     num_experiments = int(1e4) # 10000 runs
@@ -164,7 +164,8 @@ plt.legend()
 # Show the plot
 plt.show()
 
-# Effect Size
+# Effect Size (Cohnen's d is not the best. May be Cliff delta is better. But
+# because we have a lot of data (power), we are good)
 mean1 = np.mean(male_diff_array)
 mean2 = np.mean(female_diff_array)
 std1 = np.std(male_diff_array)
@@ -174,3 +175,4 @@ numerator = abs(mean1 - mean2)
 denominator = np.sqrt((std1**2)/2 + (std2**2)/2) # pooled std
 d = numerator/denominator
 print(d)
+###############################################################################
