@@ -66,13 +66,24 @@ def get_difficulty_df():
     conn.close()
     return difficulty
 
+def get_num_ratings_df():
+    conn = sqlite3.connect("rpm.db")
+    num_ratings = pd.read_sql("SELECT * FROM num_ratings", conn)
+    conn.close()
+    return num_ratings
+
 
 males = get_males_df()
 females = get_females_df()
 difficulty = get_difficulty_df()
+num_ratings = get_num_ratings_df()
 
-df = pd.concat([difficulty, males, females], axis=1)
+df = pd.concat([difficulty,num_ratings, males, females], axis=1)
 
+# A more accurate df where we keep the rows where the number of ratings is above the mean 
+#df = df[df['Number of ratings'] >= np.mean(num_ratings)]
+
+# Keep male and female
 male_diff = df[df['Male'] == 1]['Average Difficulty']
 female_diff = df[df['Female'] == 1]['Average Difficulty']
 
@@ -158,9 +169,9 @@ plt.axvline(effect_size_mean, color='y', linestyle='solid', linewidth=1.5, label
 
 
 # Adding labels and title
-plt.xlabel('Sample Means from Bootstrapping')
-plt.ylabel('Probability')
-plt.title('Probability Distribution')
+plt.xlabel(r"Cohen's d")
+plt.ylabel('Probability Density')
+plt.title('Bootstrapped Effect Size Distribution')
 
 # Add legend
 plt.legend()
