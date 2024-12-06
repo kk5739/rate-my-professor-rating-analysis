@@ -118,6 +118,7 @@ def bootstrap(arr1, arr2):
         mean2 = np.mean(sampled_ratings2)
         std1 = np.std(sampled_ratings1)
         std2 = np.std(sampled_ratings2)
+        
 
         numerator = abs(mean1 - mean2)
         denominator = np.sqrt((std1**2)/2 + (std2**2)/2) # pooled std
