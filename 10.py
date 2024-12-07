@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.metrics import (
@@ -63,12 +63,18 @@ print(df)
 df = df.dropna()
 print(df)
 
+df['Number of ratings'] = df['Number of ratings'].astype(float)
+df[column_names_tags]  = df[column_names_tags].astype(float)
+df[column_names_tags] = df[column_names_tags].div(df['Number of ratings'], axis=0)
+print(df)
+
+# Normalize columns 1 through 8 (assuming zero-based index for columns)
+columns_to_normalize = df.columns[:7]
+df[columns_to_normalize] = (df[columns_to_normalize] - df[columns_to_normalize].min()) / (df[columns_to_normalize].max() - df[columns_to_normalize].min())
+
 # Seperate predictor and outcome
 pepper = df.iloc[:,3]
 predictors = df.drop(df.columns[3], axis=1)
-# Normalize features
-scaler = StandardScaler()
-predictors = scaler.fit_transform(predictors) # Row-wise
 print(pepper)
 print(predictors)
 
