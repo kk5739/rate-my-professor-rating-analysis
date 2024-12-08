@@ -24,24 +24,3 @@ def get_numerical(q):
         df = df[df['Number of ratings'] > np.mean(df['Number of ratings'])]
         
     return df, column_names_numerical
-
-column_names_tags = ["Tough grader", 
-                 "Good feedback", 
-                 "Respected", 
-                 "Lots to read", 
-                 "Participation matters", 
-                 "Don’t skip class or you will not pass", 
-                 "Lots of homework", 
-                 "Inspirational", 
-                 "Pop quizzes!", 
-                 "Accessible", 
-                 "So many papers", 
-                 "Clear grading", 
-                 "Hilarious",
-                 "Test heavy", 
-                 "Graded by few things", 
-                 "Amazing lectures", 
-                 "Caring", 
-                 "Extra credit", 
-                 "Group projects", 
-                 "Lecture heavy"]
