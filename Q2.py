@@ -52,7 +52,7 @@ filtered_df_qual = df_qual.loc[filtered_df_num.index]
 filtered_df_tags_normalized = filtered_df_tags.div(filtered_df_num["Number of Ratings"], axis=0)
 print(filtered_df_tags_normalized.head())
 
-### Q2. ###
+###################################################### Q2. ##################################################################################################
 
 # === Hypotheses ===
 # Test: KS Test for Comparing the overal distributions  

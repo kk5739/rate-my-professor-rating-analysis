@@ -57,6 +57,8 @@ filtered_df_qual = df_qual.loc[filtered_df_num.index]
 filtered_df_tags_normalized = filtered_df_tags.div(filtered_df_num["Number of Ratings"], axis=0)
 print(filtered_df_tags_normalized.head())
 
+###################################################### Q8. ##################################################################################################
+
 # === Prepare Data ===
 # Predictors: Normalized Tags
 X = filtered_df_tags_normalized

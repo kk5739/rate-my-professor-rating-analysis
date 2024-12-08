@@ -53,7 +53,7 @@ filtered_df_tags_normalized = filtered_df_tags.div(filtered_df_num["Number of Ra
 print(filtered_df_tags_normalized.head())
 
 
-### Q4. 
+###################################################### Q4. ##################################################################################################
 
 # === Hypotheses ===
 print("H0 (Null Hypothesis): There is no gender difference in the tag awarded.")
