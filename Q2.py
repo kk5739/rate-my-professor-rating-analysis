@@ -46,7 +46,7 @@ print("H0 (Null Hypothesis): There is a gender difference in the spread of the r
 print("H1: There is a no gender difference in the spread of the ratings distribution.")
 
 # Set a threshold for the minimum number of ratings
-k = 5.37  # This df_num["Number of ratings"].mean()
+k = 5.37  # This df_num["Number of Ratings"].mean()
 
 # Step 1: Apply the threshold
 filtered_data = df_num[df_num["Number of Ratings"] >= k]
