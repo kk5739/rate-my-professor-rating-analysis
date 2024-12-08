@@ -57,16 +57,14 @@ df_tags = df_tags.reset_index(drop=True)
 
 # Combine them into one df
 df = pd.concat([df_numerical, df_tags], axis=1)
-print(df)
+
 
 # Drop rows with nan values
 df = df.dropna()
-print(df)
 
 df['Number of ratings'] = df['Number of ratings'].astype(float)
 df[column_names_tags]  = df[column_names_tags].astype(float)
 df[column_names_tags] = df[column_names_tags].div(df['Number of ratings'], axis=0)
-print(df)
 
 # Normalize columns 1 through 8 (assuming zero-based index for columns)
 columns_to_normalize = df.columns[:7]
@@ -75,16 +73,11 @@ df[columns_to_normalize] = (df[columns_to_normalize] - df[columns_to_normalize].
 # Seperate predictor and outcome
 pepper = df.iloc[:,3]
 predictors = df.drop(df.columns[3], axis=1)
-print(pepper)
-print(predictors)
 
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     predictors, pepper, test_size=0.2, random_state=rng
 )
-
-print(X_train)
-print(y_train)
 
 # Fit logistic regression
 log_reg = LogisticRegression()

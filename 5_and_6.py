@@ -4,100 +4,23 @@ import os
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
-
+from preprocessing import get_numerical
 
 # Set random seed
 rng = np.random.default_rng(17010868) 
 
-def main():
-
-    db_path = "rpm.db"
-    num_csv_path = "rmpCapstoneNum.csv"
-    qual_csv_path = "rmpCapstoneQual.csv"
-    tag_csv_path = "rmpCapstoneTags.csv"
-    
-    column_names = ["Average Rating", 
-                "Average Difficulty", 
-                "Number of ratings",
-                "Received a 'pepper'?",
-                "The proportion of students that said they would take the class again",
-                "The number of ratings coming from online classes",
-                "Male",
-                "Female"]
-    
-    # Only create the database if it doesn't exist
-    if not os.path.exists(db_path):
-        conn = sqlite3.connect(db_path)
-        df1 = pd.read_csv(num_csv_path, header = None, names = column_names)
-        
-        df1.iloc[:,0].to_sql(name="rating", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,1].to_sql(name="difficulty", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,2].to_sql(name="num_ratings", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,3].to_sql(name="pepper", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,4].to_sql(name="retake", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,5].to_sql(name="online", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,6].to_sql(name="male", con=conn, if_exists="replace", index=False)
-        df1.iloc[:,7].to_sql(name="female", con=conn, if_exists="replace", index=False)
-        
-        conn.close()
-        print("Database created and data inserted.")
-    else:
-        pass
-        
-if __name__ == "__main__":
-   main()
-
-
-def get_males_df():
-    conn = sqlite3.connect("rpm.db")
-    males = pd.read_sql("SELECT * FROM male", conn)
-    conn.close()
-    return males
-
-def get_females_df():
-    conn = sqlite3.connect("rpm.db")
-    females = pd.read_sql("SELECT * FROM female", conn)
-    conn.close()
-    return females
-
-def get_difficulty_df():
-    conn = sqlite3.connect("rpm.db")
-    difficulty = pd.read_sql("SELECT * FROM difficulty", conn)
-    conn.close()
-    return difficulty
-
-def get_num_ratings_df():
-    conn = sqlite3.connect("rpm.db")
-    num_ratings = pd.read_sql("SELECT * FROM num_ratings", conn)
-    conn.close()
-    return num_ratings
-
-
-males = get_males_df()
-females = get_females_df()
-difficulty = get_difficulty_df()
-num_ratings = get_num_ratings_df()
-
-df = pd.concat([difficulty,num_ratings, males, females], axis=1)
-
-# A more accurate df where we keep the rows where the number of ratings is above the mean 
-#df = df[df['Number of ratings'] >= np.mean(num_ratings)]
+df,column_names_numerical = get_numerical(5)
 
 # Keep male and female
-male_diff = df[df['Male'] == 1]['Average Difficulty']
-female_diff = df[df['Female'] == 1]['Average Difficulty']
+male_diff = df[(df['Male'] == 1) & (df['Female'] == 0)]['Average Difficulty']
+female_diff = df[(df['Female'] == 1) & (df['Male'] == 0)]['Average Difficulty']
 
-# # Q-Q plot
-# fig, ax = plt.subplots(figsize=(6, 6))
-# stats.probplot(female_diff, dist="norm", plot=ax)
-
-# # Customize the plot
-# ax.get_lines()[1].set_color('red')  # Make the reference line red
-# ax.set_title("Q-Q Plot")
-# ax.set_xlabel("Theoretical Quantiles")
-# ax.set_ylabel("Sample Quantiles")
-
-# Show the plot
+plt.figure(figsize=(8,4))
+plt.hist(male_diff, alpha=0.2, color='blue')
+plt.hist(female_diff, alpha=0.2, color='red')
+plt.ylabel('freq')
+plt.xlabel('avg_difficulty')
+plt.title('Histogram comparison between Male and Female Avg Difficulty')
 plt.show()
 
 test = stats.mannwhitneyu(male_diff, female_diff, alternative="two-sided")

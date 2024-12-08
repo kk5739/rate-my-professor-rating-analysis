@@ -5,14 +5,16 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from preprocessing import get_numerical
 
 rng = np.random.default_rng(17010868) 
 rng = rng.integers(1,1000000)
-df = pd.read_csv('rmpCapstoneNum.csv', header = None)
 
-# Row - wise removal
+df,column_names_numerical = get_numerical(7)
+#df_cleaned = df.drop(columns = ['The proportion of students that said they would take the class again'])
+#df_cleaned = df.dropna()
 df_cleaned = df.dropna()
-
+ 
 avg_rating = df_cleaned.iloc[:,0]
 predictors = df_cleaned.iloc[:,1:]
 
@@ -136,7 +138,11 @@ plt.figure(figsize=(18, 6))
 plt.subplot(1, 2, 1)
 plt.bar(range(len(betas_ridge)), betas_ridge)
 plt.title(f'Coefficients Ridge (alpha={best_alpha_ridge})')
-plt.xlabel('Feature Index')
+plt.xticks(
+    ticks=range(len(column_names_numerical[1:])),
+    labels=column_names_numerical[1:], 
+    rotation=45
+)
 plt.ylabel('Coefficient Value')
 
 # Lasso Regression Coefficients (for best alpha)
