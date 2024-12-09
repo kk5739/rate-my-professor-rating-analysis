@@ -40,6 +40,12 @@ df[columns_to_normalize] = (df[columns_to_normalize] - df[columns_to_normalize].
 pepper = df.iloc[:,3]
 predictors = df.drop(df.columns[3], axis=1)
 
+sns.countplot(x="Received a 'pepper'?", data=pd.DataFrame(pepper), palette='Set2')
+plt.title('Class Distribution')
+plt.xlabel('Class')
+plt.ylabel('Count')
+plt.show()
+
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     predictors, pepper, test_size=0.2, random_state=rng

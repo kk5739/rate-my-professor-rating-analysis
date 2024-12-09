@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import numpy as np
 from preprocessing import get_numerical
+import seaborn as sns
 
 # Set random seed
 rng = np.random.default_rng(17010868) 
@@ -17,6 +18,13 @@ df_cleaned = df.dropna()
  
 avg_rating = df_cleaned.iloc[:,0]
 predictors = df_cleaned.iloc[:,1:]
+
+# Compute the correlation matrix
+corr_matrix = predictors.corr()
+
+# Plot the heatmap
+plt.figure(figsize=(10, 8))  # Optional: Adjust the figure size for better readability
+sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f")
 
 # Train-Test Split (80-20)
 X_train, X_val, y_train, y_val = train_test_split(predictors, avg_rating, test_size=0.2, random_state=rng)
