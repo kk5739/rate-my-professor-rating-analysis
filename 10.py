@@ -42,7 +42,7 @@ predictors = df.drop(df.columns[3], axis=1)
 
 sns.countplot(x="Received a 'pepper'?", data=pd.DataFrame(pepper), palette='Set2')
 plt.title('Class Distribution')
-plt.xlabel('No Pepper Received (0) or Pepper Received(1)')
+plt.xlabel('No Pepper Received (0) or Pepper Received (1)')
 plt.ylabel('Count')
 plt.show()
 

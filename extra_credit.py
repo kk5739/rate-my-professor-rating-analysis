@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from preprocessing import get_numerical, get_qual
 import pandas as pd
 import seaborn as sns
+from statsmodels.stats.oneway import anova_oneway
+from statsmodels.stats.oneway import anova_oneway
 
 # Set random seed
 rng = np.random.default_rng(17010868) 
@@ -68,8 +70,13 @@ plt.ylabel('Frequency', fontsize=12)
 plt.tight_layout()
 plt.show()
 
-# Perform one-way ANOVA
-f, p_value = stats.f_oneway(*groups)
+#Check for homogeneity of variances (Levene's test)
+stat, p = stats.levene(*groups)
+print(p)
+
+# Perform Welch's one-way ANOVA
+result = anova_oneway([*groups], use_var="unequal")
+p_value = result.pvalue
 
 print("p-value:", p_value)
 
