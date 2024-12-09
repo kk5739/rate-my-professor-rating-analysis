@@ -15,10 +15,11 @@ female_diff = df[(df['Female'] == 1) & (df['Male'] == 0)]['Average Difficulty']
 
 # plot on the same figure the histograms of the two groups
 plt.figure(figsize=(8,4))
-plt.hist(male_diff, alpha=0.2, color='blue')
-plt.hist(female_diff, alpha=0.2, color='red')
-plt.ylabel('freq')
-plt.xlabel('avg_difficulty')
+plt.hist(male_diff, alpha=0.4, bins=30, color='blue', label = 'Male')
+plt.hist(female_diff, alpha=0.4, bins=30, color='red', label = 'Female')
+plt.legend()
+plt.ylabel('Freq')
+plt.xlabel('Average Difficulty')
 plt.title('Histogram comparison between Male and Female Avg Difficulty')
 plt.show()
 
@@ -66,8 +67,8 @@ effect_size = bootstrap(male_diff_array,female_diff_array)
 
 
 # 95% confidence intervals
-lower_confidence_bound_male = np.percentile(effect_size, 2.5)
-upper_confidence_bound_male = np.percentile(effect_size, 97.5)
+lower_confidence_bound = np.percentile(effect_size, 2.5)
+upper_confidence_bound = np.percentile(effect_size, 97.5)
 
 # Plot the histogram of bootstrapped effect size
 plt.figure(figsize=(8, 5))
@@ -77,8 +78,8 @@ plt.hist(effect_size, bins=50, density=True, alpha=0.6, color='b', edgecolor='bl
 effect_size_mean = np.mean(effect_size)
 
 # Add confidence bounds as vertical lines
-plt.axvline(lower_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound')
-plt.axvline(upper_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound')
+plt.axvline(lower_confidence_bound, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound')
+plt.axvline(upper_confidence_bound, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound')
 plt.axvline(effect_size_mean, color='y', linestyle='solid', linewidth=1.5, label='Mean effect size estimate')
 
 
@@ -92,3 +93,6 @@ plt.legend()
 
 # Show the plot
 plt.show()
+
+print("Effect size: ", np.mean(effect_size))
+print("95% Confidence Intervals: [", lower_confidence_bound,",",upper_confidence_bound,"]")

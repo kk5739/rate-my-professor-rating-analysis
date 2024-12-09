@@ -98,13 +98,6 @@ plt.xticks(
 )
 plt.ylabel('Coefficient Value')
 
-# Lasso Regression Coefficients (for best alpha)
-plt.subplot(1, 2, 2)
-plt.bar(range(len(betas_lasso)), betas_lasso)
-plt.title('Coefficients Lasso (alpha=0.01)')
-plt.xlabel('Feature Index')
-plt.ylabel('Coefficient Value')
-
 plt.tight_layout()
 
 plt.show()
