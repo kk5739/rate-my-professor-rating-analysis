@@ -18,6 +18,8 @@ from scipy.stats import ks_2samp
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.stats.oneway import anova_oneway
+from scipy.stats import chi2_contingency
+
 
 ## Importing the random seed attrivuted to N Number for Nikos Prasinos (np3106)
 rng = np.random.default_rng(17010868)
@@ -241,9 +243,10 @@ plt.axvline(mean_diff, color='y', linestyle='solid', linewidth=1.5, label='Mean 
 plt.axvline(lower_bound, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound')
 plt.axvline(upper_bound, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound')
 
-plt.xlabel('Bootstrapped Differences in Variance')
-plt.ylabel('Density')
-plt.title('Distribution of Variance Differences')
+# Adding labels and title
+plt.xlabel("Cohen's d")
+plt.ylabel('Probability')
+plt.title('Bootstrapped Effect Size Distribution for Variances')
 plt.legend()
 plt.show()
 
@@ -281,16 +284,23 @@ print("H1 (Alternative Hypothesis): There is a gender difference in the tag awar
 male_tags = filtered_df_tags_normalized[(filtered_df_num["Male"] == 1) & (filtered_df_num["Female"] == 0)]
 female_tags = filtered_df_tags_normalized[(filtered_df_num["Female"] == 1) & (filtered_df_num["Male"] == 0)]
 
-# Perform Mann-Whitney U test for each tag
-# Test: MW U test for comparing two independent groups without assuming normality.
+# Perform Chi-Square Test for each tag
 results = []
-for tag in filtered_df_tags_normalized.columns:
-    male_values = male_tags[tag]
-    female_values = female_tags[tag]
-    
-    # Mann-Whitney U Test
-    u_stat, p_val = stats.mannwhitneyu(male_values, female_values, alternative='two-sided')
-    results.append({"Tag": tag, "U-statistic": u_stat, "p-value": p_val})
+for tag in filtered_df_tags.columns:
+    male_count = male_tags[tag].sum()
+    female_count = female_tags[tag].sum() 
+    male_no_tag = len(male_tags) - male_count
+    female_no_tag = len(female_tags) - female_count
+
+    # Create a 2x2 contingency table
+    contingency_table = np.array([
+        [male_count, female_count],
+        [male_no_tag, female_no_tag]
+    ])
+
+    # Perform Chi-Square Test
+    chi2_stat, p_val, _, _ = chi2_contingency(contingency_table)
+    results.append({"Tag": tag, "Chi2": chi2_stat, "p-value": p_val})
 
 # Convert results to a DataFrame
 results_df = pd.DataFrame(results)
@@ -298,12 +308,12 @@ results_df = pd.DataFrame(results)
 # Sort by p-value
 results_df.sort_values(by="p-value", inplace=True)
 
-# Identify significant tags 
+# Identify significant tags
 significant_tags = results_df[results_df["p-value"] < 0.005]
 
-# Count significant tags 
+# Count significant tags
 num_significant_tags = len(significant_tags)
-total_tags = len(filtered_df_tags_normalized.columns)
+total_tags = len(filtered_df_tags.columns)
 
 print(f"\nOut of {total_tags} tags, {num_significant_tags} tag(s) showed a statistically significant gender difference.")
 
@@ -333,10 +343,10 @@ plt.bar(x - width/2, male_means, width, label='Male', color='blue', alpha=0.7)
 plt.bar(x + width/2, female_means, width, label='Female', color='red', alpha=0.7)
 
 # Add labels, title, and legend
-plt.xlabel('Tags', fontsize=12)
-plt.ylabel('Mean Normalized Tag Frequency', fontsize=12)
-plt.title('Comparison of Tag Frequencies Between Male and Female Professors', fontsize=16)
-plt.xticks(x, tags, rotation=45, fontsize=10)
+plt.xlabel('Tags')
+plt.ylabel('Mean Normalized Tag Frequency')
+plt.title('Comparison of Tag Frequencies Between Male and Female Professors')
+plt.xticks(x, tags, rotation=45)
 plt.legend()
 
 # Highlight significant tags (optional)
