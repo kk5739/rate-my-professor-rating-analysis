@@ -199,15 +199,15 @@ plt.hist(effect_size, bins=50, density=True, alpha=0.6, color='b', edgecolor='bl
 effect_size_mean = np.mean(effect_size)
 
 # Add confidence bounds as vertical lines
-plt.axvline(lower_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound (Male)')
-plt.axvline(upper_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound (Male)')
-plt.axvline(effect_size_mean, color='y', linestyle='solid', linewidth=1.5, label='Mean estimate (Male)')
+plt.axvline(lower_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='2.5% Bound')
+plt.axvline(upper_confidence_bound_male, color='r', linestyle='dashed', linewidth=1.5, label='97.5% Bound')
+plt.axvline(effect_size_mean, color='y', linestyle='solid', linewidth=1.5, label='Mean estimate')
 
 
 # Adding labels and title
-plt.xlabel('Sample Means from Bootstrapping')
+plt.xlabel("Cohen's d")
 plt.ylabel('Probability')
-plt.title('Probability Distribution')
+plt.title('Bootstrapped Effect Size Distribution')
 
 # Add legend
 plt.legend()
