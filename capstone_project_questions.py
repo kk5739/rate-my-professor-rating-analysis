@@ -223,34 +223,8 @@ effect_size_mean_diff = np.mean(effect_size)
 print(f"Mean Difference: {effect_size_mean_diff}, 95% CI: {ci_mean_diff}")
 
 # Similarly we do a boostrap but this time for the variances.
-# Here we looked at the differences as cohens d focuses on effect sizes for the difference in means
-# Here we just look at the differences
-
-def bootstrap_variance_difference(arr1, arr2, num_experiments=10_000):
-    boot_var_diff = []
-    n1 = len(arr1)
-    n2 = len(arr2)
-    
-    for i in range(num_experiments):
-        # Resample indices for each array
-        indices1 = rng.integers(low=0, high=n1, size=n1)
-        indices2 = rng.integers(low=0, high=n2, size=n2)
-
-        sampled1 = arr1[indices1]
-        sampled2 = arr2[indices2]
-
-        # Compute variances
-        var1 = np.var(sampled1, ddof=1)  # ddof=1 for sample variance
-        var2 = np.var(sampled2, ddof=1)
-
-        # Difference in variance
-        diff = var1 - var2
-        boot_var_diff.append(diff)
-    
-    return np.array(boot_var_diff)
-
-# Example usage
-boot_var_diff = bootstrap_variance_difference(male_rating_df['Average Rating'].to_numpy(),female_rating_df['Average Rating'].to_numpy())
+var1, var2
+boot_var_diff = bootstrap(np.array(var1), np.array(var2))
 
 # Compute 95% CI
 lower_bound = np.percentile(boot_var_diff, 2.5)
@@ -277,8 +251,15 @@ plt.show()
 ci_mean_diff = np.percentile(effect_size, [2.5, 97.5])
 effect_size_mean_diff = np.mean(effect_size)
 
+
+# Calculate 95% CI for variance differences
+ci_var_diff = np.percentile(boot_var_diff, [2.5, 97.5])
+effect_size_var_diff = np.mean(boot_var_diff)
+
 # Print Results
 print(f"Mean Difference: {effect_size_mean_diff}, 95% CI: {ci_mean_diff}")
+
+print(f"Variance Difference: {effect_size_var_diff}, 95% CI: {ci_var_diff}")
 
 #%%
 
