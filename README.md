@@ -115,9 +115,9 @@ This project is part of NYU's IDS Capstone (Fall 2024) and is intended for acade
 
 Capstone Group #52 – NYU Intro to Data Science
 
-- Nikolas Prasinos (np3106)
-- Kyeongmo Kang (kk5739)
-- Alexander Pegot-Ogier (ap9283)
+- Kyeongmo Kang 
+- Nikolas Prasinos
+- Alexander Pegot-Ogier 
 
 For questions or reuse inquiries, please open an issue or contact a contributor.
 
